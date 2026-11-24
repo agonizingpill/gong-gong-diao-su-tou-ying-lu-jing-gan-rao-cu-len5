@@ -9,13 +9,22 @@ from core.config import REDIS_URL
 broker = Redis.from_url(REDIS_URL, decode_responses=True)
 QUEUE = 'compute_requests'
 
-def submit(user, payload):
+def issue(user, payload):
+    """创建任务凭证并写入 queued 状态，但不入队。返回 (token, job)。"""
     token = uuid4().hex
-    item = {'token': token, 'owner': user['sub'], 'input': payload}
-    with broker.pipeline() as pipe:
-        pipe.set(f'compute:{token}', json.dumps({'owner': user['sub'], 'status': 'queued'}), ex=86400)
-        pipe.rpush(QUEUE, json.dumps(item))
-        pipe.execute()
+    job = {'token': token, 'owner': user['sub'], 'input': payload}
+    broker.set(f'compute:{token}',
+               json.dumps({'owner': user['sub'], 'status': 'queued'}), ex=86400)
+    return token, job
+
+
+def enqueue(job):
+    broker.rpush(QUEUE, json.dumps(job))
+
+
+def submit(user, payload):
+    token, job = issue(user, payload)
+    enqueue(job)
     return {'token': token, 'status': 'queued'}
 
 def view(user, token):

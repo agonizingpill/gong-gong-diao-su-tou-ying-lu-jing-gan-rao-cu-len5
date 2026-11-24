@@ -85,3 +85,62 @@ def check_station(conn, user, code):
     need(draft['first_sign']!=user['sub'], '保护位二签必须来自另一身份')
     update(conn, sight_cells, cell['code'], owner=draft['target'])
     return update(conn, light_handoffs, code, status='已移交', second_sign=user['sub'])
+
+
+# --------------------------------------------------------------------------- #
+# 封路草图：函数名兼容垫片，真正规则在 route_sketches_service / closures_engine
+# --------------------------------------------------------------------------- #
+
+def _as_dict(data):
+    if data is None:
+        return {}
+    if isinstance(data, dict):
+        return data
+    if hasattr(data, 'model_dump'):
+        return data.model_dump()
+    return {k: getattr(data, k) for k in dir(data) if not k.startswith('_') and not callable(getattr(data, k, None))}
+
+
+def _split_user_data(args):
+    user = next((a for a in args if isinstance(a, dict) and 'sub' in a), None)
+    data = next((_as_dict(a) for a in args if a is not user), {})
+    return user or {'sub': 'plot-checks'}, data
+
+
+def evaluate_closures(conn, *args):
+    from domain import route_sketches_service as svc
+    _, data = _split_user_data(args)
+    return svc.evaluate_only(conn, data)
+
+
+def block_routes(conn, *args):
+    from domain import route_sketches_service as svc
+    user, data = _split_user_data(args)
+    return svc.sync_run(conn, user, data)
+
+
+def trial_closures(conn, *args):
+    from domain import route_sketches_service as svc
+    user, data = _split_user_data(args)
+    return svc.trial(conn, user, data)
+
+
+def restore_sketch(conn, *args):
+    from domain import route_sketches_service as svc
+    user, data = _split_user_data(args)
+    return svc.restore_sketch(conn, user, data)
+
+
+def pin_sketch(conn, *args):
+    from domain import route_sketches_service as svc
+    user, data = _split_user_data(args)
+    if data.get('token'):
+        row = svc.apply_token(conn, user, data)
+        data = {**data, 'code': row['code']}
+    return svc.archive_sketch(conn, user, data)
+
+
+def archive_sketch(conn, *args):
+    from domain import route_sketches_service as svc
+    user, data = _split_user_data(args)
+    return svc.archive_sketch(conn, user, data)

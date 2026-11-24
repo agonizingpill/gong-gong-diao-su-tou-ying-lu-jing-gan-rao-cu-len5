@@ -6,6 +6,9 @@ import numpy as np
 from sklearn.cluster import SpectralClustering
 
 def calculate(data):
+    if isinstance(data, dict) and data.get('kind') in ('route_closures', 'closures', 'closure_check'):
+        from domain.closures_engine import run_job
+        return run_job(data)
     band, points, groups = data['band'], data['points'], data['clusters']
     points = sorted(points,key=lambda point:(point['y'],point['x']))
     by_position = {(point['x'],point['y']):i for i,point in enumerate(points)}

@@ -52,6 +52,16 @@ Compose 运行 Nginx、Python FastAPI、独立 Redis 消费进程、PostgreSQL 1
 
 SQL 实体与约束在 `backend/domain` 下维护。前端使用原生 ES modules。核心算子为 SpectralClustering。以四邻格构图，按遮挡率和串光率差的平方和设定指数权重。谱分组按格序重新编号，输出边切分数量、权重占比和底图哈希。
 
+### 封路草图与归档复核
+
+领班可从一张已归档的遮挡图谱（原图）试算封路，计算沿用原图 `layout` 观测，不读取之后变更的底图版本。封路只能是四邻接方格之间的边；删除这些边后求连通片区，同一灯组（cluster）不能跨到多个互不相通的片区，片区数多于灯组数时结果与错误信息会列出“断开的格子”。
+
+- 实体 `route_sketches`（封路草图），维护最新封路 `closures/edge_keys`、封路修订 `revision`、最近可用结果 `result/based_on`、上张可用快照 `usable` 与归档快照 `archived_snapshot`。
+- 主接口：`POST /route_sketches/trial-block`（提交试算凭证，同 `segment-bank` 走 compute token；接口会即时补算凭证终态，worker 也可处理 `kind=route_closures` 的任务）、`POST /route_sketches/apply`（按凭证新旧应用，旧测算晚到返回 409 且不替换当前草图）、`POST /route_sketches/restore-sketch`（恢复上张可用草图与封路）、`POST /route_sketches/archive-sketch`（草图 `based_on` 落后最新封路 `revision` 时退回 409）、`GET /route_sketches` 与 `GET /shadow_plans/{code}`（复核员查询归档草图所用原图与封路）。
+- 同一组能力也挂在 `/shadow_plans/*`、`/closure_sketches/*`、`/sketches/*` 等兼容命名下，并接受 `plan/map/source_plan`、`closures/blocks/blocked_edges` 等常见字段别名。
+- 图谱页面（`frontend/src/pages/shadow_plans.js` + `plot-board.js`）可切换相邻通路、试算、恢复、归档，并在“归档草图查询”区向复核员展示原图编号/版本/网格与封路边。
+
+
 观测和展品为虚构，本应用用于灯影分区草案与责任记录。现场灯具独立控制。
 
 [MIT](LICENSE)

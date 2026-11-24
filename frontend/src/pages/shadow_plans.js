@@ -88,6 +88,41 @@
         "reviewer"
       ],
       "success": "已写入"
+    },
+    {
+      "name": "trial_closures",
+      "label": "提交封路试算（编号与 JSON 表单）",
+      "path": "/route_sketches/trial-block",
+      "fields": [
+        { "name": "code", "label": "草图号", "kind": "text", "initial": "SKETCH-BANK-01" },
+        { "name": "plan", "label": "归档原图号", "kind": "text", "initial": "MAP-BANK-01" },
+        { "name": "closures", "label": "封路边编号对（JSON）", "kind": "json", "initial": [] }
+      ],
+      "help": "只封相邻方格间的通路；同一灯组被片区割裂时测算失败并指出断开的格子。",
+      "roles": ["operator", "reviewer"],
+      "success": "已试算"
+    },
+    {
+      "name": "restore_sketch",
+      "label": "恢复最近可用草图（编号表单）",
+      "path": "/route_sketches/restore-sketch",
+      "fields": [
+        { "name": "code", "label": "草图号", "kind": "text", "initial": "SKETCH-BANK-01" }
+      ],
+      "help": "测算失败后恢复最近一张可用草图及其封路。",
+      "roles": ["operator", "reviewer"],
+      "success": "已恢复"
+    },
+    {
+      "name": "archive_sketch",
+      "label": "归档封路草图（编号表单）",
+      "path": "/route_sketches/archive-sketch",
+      "fields": [
+        { "name": "code", "label": "草图号", "kind": "text", "initial": "SKETCH-BANK-01" }
+      ],
+      "help": "草图必须跟得上最新封路；归档后复核员可在图谱页面查询原图与封路。",
+      "roles": ["operator", "reviewer"],
+      "success": "已归档"
     }
   ]
 };
@@ -95,6 +130,6 @@
         export const {title} = page;
         export const key = "shadow_plans";
         export async function render(root, role) {
-          await workspace(root, role, {...page, renderData:plotBoard});
+          await workspace(root, role, {...page, renderData: rows => plotBoard(rows, role)});
 
         }

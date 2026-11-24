@@ -89,3 +89,30 @@ nav {border-inline-end:1px dashed var(--line);}
 .plot-point.protected {border:2px dashed oklch(26% .058 51);}
 .plot-point[aria-pressed=true] {outline:2px solid var(--ink);outline-offset:-3px;}
 @media(max-width:720px){.shell {grid-template-columns:1fr;} nav {border-inline-end:0;} }
+
+/* 封路试算与归档草图 */
+.sketch-archive { margin-top:2rem; border-block-start:3px solid var(--accent); padding-top:1.2rem; }
+.closure-tools { margin-top:1.1rem; display:grid; gap:.7rem; }
+.closure-head { display:flex; gap:.6rem; align-items:end; flex-wrap:wrap; }
+.closure-head label { flex:1 1 12rem; }
+.closure-head .quiet, .closure-actions .quiet { margin-left:0; }
+.closure-actions { display:flex; gap:.6rem; flex-wrap:wrap; }
+.edge-list { display:flex; flex-wrap:wrap; gap:.35rem; max-height:11rem; overflow:auto;
+  padding:.5rem; border:1px dashed var(--line); border-radius:3px; }
+.edge-chip { padding:.22rem .5rem; font-size:.78rem; font-weight:600; background:var(--paper);
+  color:var(--ink); border:1px solid var(--line); }
+.edge-chip[aria-pressed=true], .edge-chip.edge-on { background:oklch(45% .17 28);
+  border-color:oklch(45% .17 28); color:oklch(97% .02 80); }
+button.pick-on { outline:2px solid oklch(45% .17 28); outline-offset:1px; }
+.closure-grid .plot-point { position:relative; }
+.plot-point.bar-right::after { content:'✕'; position:absolute; top:-2px; right:-7px; z-index:2;
+  color:oklch(50% .19 27); font-weight:900; font-size:.95rem; text-shadow:0 0 2px var(--sheet); }
+.plot-point.bar-bottom::after { content:'✕'; position:absolute; left:50%; bottom:-9px; transform:translateX(-50%);
+  z-index:2; color:oklch(50% .19 27); font-weight:900; font-size:.95rem; text-shadow:0 0 2px var(--sheet); }
+.sketch-report:empty { display:none; }
+.sketch-state { font-weight:650; margin:.2rem 0; }
+.archived-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(19rem,100%),1fr)); gap:.8rem; margin:.7rem 0 1.2rem; }
+.archived-card { border-inline-start-color:oklch(45% .17 28); }
+.closure-list { margin:.2rem 0; padding-left:1.1rem; }
+.broken-cells { color:oklch(50% .19 27); font-weight:700; }
+.sketch-table { margin-top:.6rem; }
